@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(brew list:*)",
+      "Bash(pdftotext:*)",
+      "Bash(pdfinfo:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(./node_modules/.bin/tailwindcss:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run build:*)",
+      "Bash(curl:*)",
+      "Bash(chmod:*)",
+      "Bash(ls:*)",
+      "Bash(while read f)",
+      "Bash(do echo \"Found: $f\")",
+      "Bash(done)",
+      "Bash(sshpass -p 'Sancai123' ssh:*)",
+      "Bash(ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no root@59.110.18.172 'echo \"\"connection test\"\"')",
+      "Bash(ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@59.110.18.172 'echo \"\"SSH连接成功！\"\" && hostname && whoami')",
+      "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i ~/.ssh/id_rsa root@59.110.18.172 'echo \"\"SSH连接测试成功！\"\" && pwd && whoami')",
+      "Bash(ssh:*)",
+      "Bash(./deploy-with-password.sh:*)",
+      "Bash(sshpass -p 'Sancai123' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@59.110.18.172 'cd /opt/ai-toubiao-demo && docker-compose ps')",
+      "Bash(sshpass -p 'Sancai123' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@59.110.18.172 'cd /opt/ai-toubiao-demo && docker images | grep ai-toubiao')",
+      "Bash(sshpass -p 'Sancai123' scp:*)",
+      "Bash(sshpass -p 'Sancai123' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@59.110.18.172 'cd /opt/ai-toubiao-demo && docker-compose up -d')",
+      "Bash(sshpass -p 'Sancai123' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@59.110.18.172 'cd /opt/ai-toubiao-demo && docker-compose logs --tail=20')",
+      "Bash(tar:*)",
+      "Bash(sshpass:*)"
+    ]
+  }
+}

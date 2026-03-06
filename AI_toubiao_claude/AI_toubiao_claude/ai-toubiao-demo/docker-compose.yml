@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    image: ai-toubiao-demo:latest
+    container_name: ai-toubiao-web
+    ports:
+      - "8080:80"  # 使用8080端口，避免与现有系统冲突
+    restart: unless-stopped
+    networks:
+      - ai-toubiao-network
+    # 使用独立的网络和容器名称，确保不影响现有系统
+
+networks:
+  ai-toubiao-network:
+    driver: bridge
+    name: ai-toubiao-network  # 指定网络名称，避免冲突
