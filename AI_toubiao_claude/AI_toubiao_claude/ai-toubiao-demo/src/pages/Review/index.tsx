@@ -15,6 +15,7 @@ import {
   CheckCircle,
   ArrowRight,
   Sparkles,
+  Clock,
 } from 'lucide-react';
 import { reviewList } from '../../data/mockData';
 
@@ -58,12 +59,35 @@ const competitorIntel = [
   { name: '我方', bidCount: 95, winRate: 38, avgPriceRatio: 0.93, strength: '综合能力' },
 ];
 
+// 对手近 3 年中标轨迹（mock，简化展示）
+const competitorTrail: Record<string, { project: string; date: string }[]> = {
+  'A公司': [
+    { project: '某省政务云平台项目', date: '2025-09' },
+    { project: '某市智慧交通一期', date: '2025-03' },
+    { project: '某区教育信息化采购', date: '2024-11' },
+    { project: '某市数字城管系统', date: '2024-06' },
+  ],
+  'B公司': [
+    { project: '某市政务大厅信息化', date: '2025-08' },
+    { project: '某区智慧园区建设', date: '2025-01' },
+    { project: '某县电子政务平台', date: '2024-09' },
+  ],
+  'C公司': [
+    { project: '某省大数据中心建设', date: '2025-10' },
+    { project: '某市云计算平台', date: '2025-04' },
+    { project: '某区智慧医疗系统', date: '2024-12' },
+    { project: '某市公安信息化', date: '2024-07' },
+  ],
+};
+
 const detailedReviewList = [
   ...reviewList,
   {
     id: 'REV-003',
     projectName: '某市数字政府平台建设项目',
-    bidDate: '2025-10-28',
+    bidDate: '2025-10-25',
+    openBidDate: '2025-10-28',
+    winningDate: '2025-10-31',
     result: 'win' as const,
     ourPrice: '2,380万元',
     winningPrice: '2,380万元',
@@ -73,7 +97,9 @@ const detailedReviewList = [
   {
     id: 'REV-004',
     projectName: '某区智慧社区管理系统',
-    bidDate: '2025-09-15',
+    bidDate: '2025-09-12',
+    openBidDate: '2025-09-15',
+    winningDate: '2025-09-20',
     result: 'lose' as const,
     ourPrice: '680万元',
     winningPrice: '550万元',
@@ -83,7 +109,9 @@ const detailedReviewList = [
   {
     id: 'REV-005',
     projectName: '某医院信息化升级项目',
-    bidDate: '2025-08-20',
+    bidDate: '2025-08-17',
+    openBidDate: '2025-08-20',
+    winningDate: '2025-08-24',
     result: 'win' as const,
     ourPrice: '1,150万元',
     winningPrice: '1,150万元',
@@ -103,7 +131,7 @@ export default function Review() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col gap-8">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-800">投标复盘系统</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">投标项目复盘系统</h1>
         <p className="text-gray-500 mt-1">
           AI分析历史投标数据，总结经验提升中标率
         </p>
@@ -321,6 +349,27 @@ export default function Review() {
                   </tbody>
                 </table>
               </div>
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <h4 className="font-medium text-gray-800 mb-4 flex items-center gap-2 text-sm">
+                  <Clock className="w-4 h-4 text-gray-500" />
+                  近 3 年中标轨迹（典型项目）
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {(['A公司', 'B公司', 'C公司'] as const).map((key) => (
+                    <div key={key} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                      <p className="text-sm font-bold text-gray-700 mb-3">{key}</p>
+                      <ul className="space-y-2 text-xs text-gray-600">
+                        {(competitorTrail[key] ?? []).map((item, i) => (
+                          <li key={i} className="flex justify-between gap-2">
+                            <span className="truncate">{item.project}</span>
+                            <span className="text-gray-400 shrink-0">{item.date}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -401,6 +450,42 @@ export default function Review() {
                   <p className="text-xl font-bold text-gray-800 leading-tight">{selectedReview.projectName}</p>
                 </div>
 
+                {/* 时间线复盘：开标日期 - 投标日期 - 中标日期 */}
+                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-indigo-500" /> 时间线复盘
+                  </p>
+                  <div className="flex items-start">
+                    <div className="flex-1 flex flex-col items-center min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-indigo-100 border-2 border-indigo-500 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <p className="text-xs font-bold text-gray-500 mt-2 mb-0.5">开标日期</p>
+                      <p className="text-sm font-bold text-gray-800">{selectedReview.openBidDate}</p>
+                    </div>
+                    <div className="flex-shrink-0 pt-5 w-6 flex items-center">
+                      <div className="h-0.5 w-full bg-gray-300 rounded" />
+                    </div>
+                    <div className="flex-1 flex flex-col items-center min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 border-2 border-blue-500 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <p className="text-xs font-bold text-gray-500 mt-2 mb-0.5">投标日期</p>
+                      <p className="text-sm font-bold text-gray-800">{selectedReview.bidDate}</p>
+                    </div>
+                    <div className="flex-shrink-0 pt-5 w-6 flex items-center">
+                      <div className="h-0.5 w-full bg-gray-300 rounded" />
+                    </div>
+                    <div className="flex-1 flex flex-col items-center min-w-0">
+                      <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedReview.result === 'win' ? 'bg-green-100 border-green-500' : 'bg-gray-100 border-gray-400'}`}>
+                        <Award className={`w-5 h-5 ${selectedReview.result === 'win' ? 'text-green-600' : 'text-gray-500'}`} />
+                      </div>
+                      <p className="text-xs font-bold text-gray-500 mt-2 mb-0.5">中标日期</p>
+                      <p className="text-sm font-bold text-gray-800">{selectedReview.winningDate}</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-8 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                   <div>
                     <p className="text-xs text-gray-400 font-bold mb-1">我方报价</p>
@@ -464,6 +549,12 @@ export default function Review() {
                     content: '根据近6个月数据分析，您的报价普遍偏高5-10%。建议在信息化建设类项目中，将报价控制在预算的90-93%区间，可提升中标率约8%。',
                     type: 'warning',
                     impact: '+8%中标率',
+                  },
+                  {
+                    title: '报价下浮区间与预算占比',
+                    content: '结合对手近三年报价下浮区间（约5%-12%）与预算占比分布，建议将报价下浮控制在6%-9%，预算占比控制在91%-94%，预计提升中标率约12%。',
+                    type: 'success',
+                    impact: '预计提升中标率约12%',
                   },
                   {
                     title: '优势领域识别',

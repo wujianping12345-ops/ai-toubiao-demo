@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   FileText,
   ChevronDown,
@@ -19,8 +19,10 @@ import {
   File,
   Target,
   TrendingUp,
-  AlertTriangle
+  AlertTriangle,
+  Lock,
 } from 'lucide-react';
+import { useMembership } from '../../context/MembershipContext';
 import { bidInfoList, docTemplates, sampleGeneratedDoc } from '../../data/mockData';
 
 type GenerateStatus = 'idle' | 'selecting' | 'generating' | 'completed';
@@ -50,6 +52,7 @@ const scoreData = {
 };
 
 export default function DocGenerate() {
+  const { canUseDocGenerate, canUseGenerate, monthlyGenerateUsed, monthlyGenerateLimit, useGenerate } = useMembership();
   const [status, setStatus] = useState<GenerateStatus>('idle');
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('');
@@ -57,14 +60,22 @@ export default function DocGenerate() {
   const [generatingProgress, setGeneratingProgress] = useState(0);
   const [showHistory, setShowHistory] = useState(true);
   const [showExportOptions, setShowExportOptions] = useState(false);
+  const completedCountedRef = useRef(false);
+
+  useEffect(() => {
+    if (status === 'completed' && !completedCountedRef.current) {
+      completedCountedRef.current = true;
+      useGenerate();
+    }
+    if (status !== 'completed') completedCountedRef.current = false;
+  }, [status, useGenerate]);
 
   const handleGenerate = () => {
-    if (!selectedProject || !selectedTemplate) return;
+    if (!selectedProject || !selectedTemplate || !canUseGenerate) return;
 
     setStatus('generating');
     setGeneratingProgress(0);
 
-    // 模拟生成过程
     const interval = setInterval(() => {
       setGeneratingProgress((prev) => {
         if (prev >= 100) {
@@ -85,14 +96,46 @@ export default function DocGenerate() {
     setExpandedSection(0);
   };
 
+  if (!canUseDocGenerate) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col gap-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">招标文件生成系统</h1>
+          <p className="text-gray-500 mt-1">AI智能生成标准投标文件，自动填充项目信息</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border border-gray-200">
+          <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500 mb-6">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">功能已禁用</h2>
+          <p className="text-gray-500 text-center max-w-md mb-6">
+            当前为免费体验版，招标文件生成功能已关闭。升级为基础会员或更高级别即可使用。
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.hash = ''}
+            className="px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700"
+          >
+            前往顶部切换会员等级
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col gap-6">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-800">文件生成系统</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">招标文件生成系统</h1>
         <p className="text-gray-500 mt-1">
           AI智能生成标准投标文件，自动填充项目信息
         </p>
+        {monthlyGenerateLimit !== Infinity && (
+          <p className="text-sm text-amber-600 mt-2">
+            本月已使用 {monthlyGenerateUsed} / {monthlyGenerateLimit} 次（招标+投标生成合计）
+          </p>
+        )}
       </div>
 
       <div className="flex gap-6 items-start">
@@ -195,21 +238,44 @@ export default function DocGenerate() {
             )}
 
             {status === 'completed' && (
-              <div className="mb-4 p-3 bg-green-50 rounded-lg flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-green-700">投标文件生成完成!</span>
-              </div>
+              <>
+                <div className="mb-4 p-3 bg-green-50 rounded-lg flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-sm text-green-700">投标文件生成完成!</span>
+                </div>
+                <div className="mb-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                  <h4 className="text-sm font-bold text-amber-800 mb-3 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    标书风险扫描结果
+                  </h4>
+                  <p className="text-xs text-amber-700 mb-3">共检测 3 项，2 项通过、1 项待确认</p>
+                  <ul className="space-y-2 text-xs">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                      <span className="text-gray-700">资质条款与营业执照一致，无废标隐患</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                      <span className="text-gray-700">签字盖章页完整，格式符合要求</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span className="text-gray-700">技术方案中“质保期”表述建议与招标文件完全一致，避免歧义</span>
+                    </li>
+                  </ul>
+                </div>
+              </>
             )}
 
             <div className="flex gap-2">
               {status === 'idle' && (
                 <button
                   onClick={handleGenerate}
-                  disabled={!selectedProject || !selectedTemplate}
+                  disabled={!selectedProject || !selectedTemplate || !canUseGenerate}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   <Sparkles className="w-4 h-4" />
-                  AI一键生成
+                  {!canUseGenerate ? `本月次数已用完 (${monthlyGenerateUsed}/${monthlyGenerateLimit})` : 'AI一键生成'}
                 </button>
               )}
 

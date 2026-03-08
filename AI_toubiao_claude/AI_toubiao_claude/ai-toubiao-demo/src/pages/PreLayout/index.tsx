@@ -11,7 +11,7 @@ import {
   BarChart3,
   Map
 } from 'lucide-react';
-import { policyList } from '../../data/mockData';
+import { policyList, upcomingBidList, competitionHeatByRegion } from '../../data/mockData';
 
 const regionPolicies = [
   { region: '浙江省', count: 156, trend: 'up', focus: '数字化改革、绿色建筑' },
@@ -82,6 +82,41 @@ export default function PreLayout() {
 
       <div className="flex flex-col gap-8">
         
+        {/* 采购意向与拟建项目 */}
+        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-4 border-b border-gray-100 pb-4">
+            <div className="p-2 bg-emerald-50 rounded-lg">
+              <Map className="w-5 h-5 text-emerald-600" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">采购意向与拟建项目</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-4">预计 30–90 天内招标的重大项目，便于提前布局。</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-500 border-b border-gray-100">
+                  <th className="pb-3 font-medium">项目名称</th>
+                  <th className="pb-3 font-medium">地区</th>
+                  <th className="pb-3 font-medium">预估金额</th>
+                  <th className="pb-3 font-medium">行业</th>
+                  <th className="pb-3 font-medium">预计招标</th>
+                </tr>
+              </thead>
+              <tbody>
+                {upcomingBidList.map((row) => (
+                  <tr key={row.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                    <td className="py-3 text-gray-800 font-medium">{row.title}</td>
+                    <td className="py-3 text-gray-600">{row.region}</td>
+                    <td className="py-3 text-gray-600">{row.estimatedBudget}</td>
+                    <td className="py-3 text-gray-600">{row.category}</td>
+                    <td className="py-3 text-gray-600">约 {row.expectedDays} 天内</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         {/* Section 1: 趋势预测 (Formerly Analysis Tab) */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
@@ -169,35 +204,17 @@ export default function PreLayout() {
               </div>
             </div>
 
-            {/* 竞争态势分析 */}
-            <div className="border border-gray-100 rounded-lg p-4">
+            {/* 竞争态势分析 + 竞争热力图 */}
+            <div className="border border-gray-100 rounded-lg p-4 mb-4">
               <h3 className="font-medium text-gray-800 mb-4 flex items-center gap-2">
                 <Scale className="w-5 h-5 text-purple-600" />
                 竞争态势分析
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  {
-                    title: '市场集中度',
-                    value: 'CR4: 35%',
-                    desc: '前四大企业市占率',
-                    trend: '竞争较为分散，中小企业机会多',
-                    color: 'green'
-                  },
-                  {
-                    title: '平均中标率',
-                    value: '28.5%',
-                    desc: '行业平均水平',
-                    trend: '您的中标率高于行业平均7.3%',
-                    color: 'blue'
-                  },
-                  {
-                    title: '价格竞争指数',
-                    value: '0.72',
-                    desc: '价格敏感度',
-                    trend: '价格因素影响显著，建议优化成本',
-                    color: 'orange'
-                  },
+                  { title: '市场集中度', value: 'CR4: 35%', desc: '前四大企业市占率', trend: '竞争较为分散，中小企业机会多', color: 'green' },
+                  { title: '平均中标率', value: '28.5%', desc: '行业平均水平', trend: '您的中标率高于行业平均7.3%', color: 'blue' },
+                  { title: '价格竞争指数', value: '0.72', desc: '价格敏感度', trend: '价格因素影响显著，建议优化成本', color: 'orange' },
                 ].map((item, index) => (
                   <div key={index} className={`p-4 rounded-lg bg-${item.color}-50 border border-${item.color}-100`}>
                     <p className="text-sm text-gray-500">{item.title}</p>
@@ -205,6 +222,26 @@ export default function PreLayout() {
                     <p className="text-xs text-gray-400 mt-1">{item.desc}</p>
                     <p className={`text-xs text-${item.color}-600 mt-2 pt-2 border-t border-${item.color}-100`}>{item.trend}</p>
                   </div>
+                ))}
+              </div>
+            </div>
+            <div className="border border-gray-100 rounded-lg p-4">
+              <h3 className="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                <Map className="w-5 h-5 text-rose-500" />
+                竞争烈度分布（按地区）
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {competitionHeatByRegion.map((item) => (
+                  <span
+                    key={item.region}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
+                      item.level === 'high' ? 'bg-red-100 text-red-800' :
+                      item.level === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
+                    }`}
+                  >
+                    {item.region}
+                    <span className="opacity-80">({item.label})</span>
+                  </span>
                 ))}
               </div>
             </div>

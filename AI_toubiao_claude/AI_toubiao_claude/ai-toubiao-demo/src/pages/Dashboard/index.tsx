@@ -91,7 +91,7 @@ export default function Dashboard() {
               {
                 title: '全链条智能体',
                 subtitle: '覆盖投标全生命周期的智能服务',
-                desc: '依托人工智能技术，打造覆盖“信息获取-前置布局-方案定制-文件生成-复盘优化”的一站式服务体系。',
+                desc: '依托人工智能技术，打造覆盖“信息获取-前置布局-投标文件生成-招标文件生成-复盘优化”的一站式服务体系。',
                 icon: Target,
                 color: 'text-blue-600',
                 bg: 'bg-blue-500',
@@ -108,8 +108,8 @@ export default function Dashboard() {
               },
               {
                 title: '效率革命',
-                subtitle: '信息获取周期缩短50%+',
-                desc: '实现目标项目前置信息的全网自动化抓取与分类，准确率达90%以上，大幅降低人工成本。',
+                subtitle: '信息提前 8–12 小时，周期缩短50%+',
+                desc: '实现目标项目前置信息的全网自动化抓取与分类，匹配准确率可达 92%+，无效信息过滤率 95%+，大幅降低人工成本。',
                 icon: Cpu,
                 color: 'text-purple-600',
                 bg: 'bg-purple-500',
@@ -183,6 +183,9 @@ export default function Dashboard() {
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">全链路智能化作业流程</h2>
               <p className="text-lg text-gray-600">五大核心模块深度协同，构建闭环式投标生态</p>
+              <p className="text-sm text-gray-500 mt-3 max-w-2xl mx-auto">
+                本平台为商业平台 AI 全流程赋能，与官方合规保障平台互补，助力企业提升投标效率与中标率。
+              </p>
             </div>
 
             <div className="relative">
@@ -206,21 +209,21 @@ export default function Dashboard() {
                     path: '/pre-layout' 
                   },
                   { 
-                    title: '方案定制', 
+                    title: '投标文件生成', 
                     desc: '最优策略智能匹配', 
                     icon: Layers, 
                     color: 'bg-purple-500', 
                     path: '/plan-custom' 
                   },
                   { 
-                    title: '文件生成', 
+                    title: '招标文件生成', 
                     desc: '标准标书一键直出', 
                     icon: FileText, 
                     color: 'bg-pink-500', 
                     path: '/doc-generate' 
                   },
                   { 
-                    title: '投标复盘', 
+                    title: '投标项目复盘', 
                     desc: '数据驱动持续优化', 
                     icon: BarChart3, 
                     color: 'bg-orange-500', 
@@ -249,8 +252,8 @@ export default function Dashboard() {
                 { 
                   title: '信息收集', 
                   subtitle: '智能商机捕获系统',
-                  desc: '基于AI的全网招标信息监控与采集引擎。不再是被动等待，而是主动出击。系统24小时不间断扫描全网数千个招标平台，利用NLP技术精准识别与您业务匹配的商机，并实时推送提醒。',
-                  features: ['覆盖3000+主流招标平台', '智能语义匹配，剔除无效信息', '实时微信/邮件消息推送', '历史招标数据回溯'],
+                  desc: '基于AI的全网招标信息监控与采集引擎。不再是被动等待，而是主动出击。系统24小时不间断扫描全网数千个招标平台，利用NLP技术精准识别与您业务匹配的商机，部分商机可提前 8–12 小时触达，并实时推送提醒。',
+                  features: ['覆盖3000+主流招标平台', '匹配准确率 92%+，无效信息过滤率 95%+', '实时微信/邮件消息推送', '历史招标数据回溯'],
                   icon: Search, 
                   color: 'text-blue-500', 
                   bg: 'bg-blue-50',
@@ -269,7 +272,7 @@ export default function Dashboard() {
                   btnText: '查看情报分析'
                 },
                 { 
-                  title: '方案定制', 
+                  title: '投标文件生成', 
                   subtitle: 'AI智能策略与大纲生成',
                   desc: '结合项目需求与企业优势，一键生成最优投标策略。AI自动拆解招标文件，提取评分标准，为您推荐高分技术方案架构，并智能匹配企业过往类似优秀案例，大幅提升技术分。',
                   features: ['评分标准自动拆解', '高分标书大纲推荐', '企业优势智能匹配', '控标点精准识别'],
@@ -280,7 +283,7 @@ export default function Dashboard() {
                   btnText: '定制投标方案'
                 },
                 { 
-                  title: '文件生成', 
+                  title: '招标文件生成', 
                   subtitle: 'RAG增强自动写作引擎',
                   desc: '告别繁琐的文档编写工作。基于RAG检索增强生成技术，系统能够调用您的企业知识库，自动撰写技术方案、商务文件与资格证明。支持一键排版，生成符合格式要求的标准标书。',
                   features: ['技术方案自动撰写', '商务报表自动生成', '企业资质一键填充', '智能排版与校对'],
@@ -291,7 +294,7 @@ export default function Dashboard() {
                   btnText: '一键生成标书'
                 },
                 { 
-                  title: '投标复盘', 
+                  title: '投标项目复盘', 
                   subtitle: '全维度数据复盘与优化',
                   desc: '让每一次投标都成为经验的积累。系统自动收集开标结果，多维度分析中标或失标原因。为您提供可视化的数据报表，持续优化投标策略，提升团队整体中标率。',
                   features: ['多维度胜负原因分析', '投标漏斗数据可视化', '团队绩效智能评估', '策略优化建议报告'],
@@ -363,9 +366,9 @@ export default function Dashboard() {
                           <div className="absolute -top-6 -right-6 p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white z-20 transform transition-all duration-700 group-hover:-translate-y-2 group-hover:translate-x-2">
                              {module.title === '信息收集' && <Database className="w-5 h-5 text-blue-400" />}
                              {module.title === '前置布局' && <ShieldCheck className="w-5 h-5 text-indigo-400" />}
-                             {module.title === '方案定制' && <Cpu className="w-5 h-5 text-purple-400" />}
-                             {module.title === '文件生成' && <CheckCircle2 className="w-5 h-5 text-pink-400" />}
-                             {module.title === '投标复盘' && <TrendingUp className="w-5 h-5 text-orange-400" />}
+                             {module.title === '投标文件生成' && <Cpu className="w-5 h-5 text-purple-400" />}
+                             {module.title === '招标文件生成' && <CheckCircle2 className="w-5 h-5 text-pink-400" />}
+                             {module.title === '投标项目复盘' && <TrendingUp className="w-5 h-5 text-orange-400" />}
                           </div>
                         </div>
                       </div>

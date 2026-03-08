@@ -11,7 +11,9 @@ import {
   FileText,
   Users,
   Shield,
+  Lock,
 } from 'lucide-react';
+import { useMembership } from '../../context/MembershipContext';
 import { bidInfoList } from '../../data/mockData';
 
 const samplePlans = [
@@ -65,14 +67,22 @@ const requirementAnalysis = {
   ],
 };
 
-// 竞争对手分析数据
+// 竞争对手分析数据（含近 3 年报价下浮区间 mock）
 const competitorAnalysis = [
-  { name: '竞争对手A', strength: '价格优势', weakness: '业绩偏少', winProb: 25 },
-  { name: '竞争对手B', strength: '本地化服务', weakness: '技术方案一般', winProb: 20 },
-  { name: '竞争对手C', strength: '资质齐全', weakness: '报价偏高', winProb: 15 },
+  { name: '竞争对手A', strength: '价格优势', weakness: '业绩偏少', winProb: 25, priceDownRange: '5%-8%' },
+  { name: '竞争对手B', strength: '本地化服务', weakness: '技术方案一般', winProb: 20, priceDownRange: '3%-6%' },
+  { name: '竞争对手C', strength: '资质齐全', weakness: '报价偏高', winProb: 15, priceDownRange: '8%-12%' },
+];
+
+// 投标要点清单（从招标文件解析出的要点，mock）
+const bidKeyPoints = [
+  { type: '资质要求', items: ['系统集成一级资质', '近三年类似项目业绩', '项目经理高级项目管理师'] },
+  { type: '参数标准', items: ['支持国产化信创环境', '响应时间 ≤2s', '可用性 ≥99.9%'] },
+  { type: '评审权重', items: ['技术方案 40%', '商务报价 30%', '企业资质 15%', '业绩案例 10%', '服务承诺 5%'] },
 ];
 
 export default function PlanCustom() {
+  const { canUseDocGenerate, canUseGenerate, monthlyGenerateUsed, monthlyGenerateLimit, useGenerate } = useMembership();
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedPlan, setSelectedPlan] = useState<string | null>('PLAN-001');
 
@@ -80,14 +90,52 @@ export default function PlanCustom() {
   const maxTotalScore = evaluationCriteria.reduce((sum, c) => sum + c.maxScore, 0);
   const estimatedWinRate = Math.round((totalScore / maxTotalScore) * 100 * 0.45 + 10);
 
+  const handleApplyPlan = () => {
+    if (!canUseGenerate) return;
+    useGenerate();
+    alert('已应用方案，本次将计入生成次数。');
+  };
+
+  if (!canUseDocGenerate) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col gap-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">投标文件生成系统</h1>
+          <p className="text-gray-500 mt-1">AI智能匹配最优方案，预测评分提升中标率</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border border-gray-200">
+          <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500 mb-6">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">功能已禁用</h2>
+          <p className="text-gray-500 text-center max-w-md mb-6">
+            当前为免费体验版，投标文件生成功能已关闭。升级为基础会员或更高级别即可使用。
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.hash = ''}
+            className="px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700"
+          >
+            前往顶部切换会员等级
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col gap-6">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-2xl font-semibold text-gray-800">方案定制系统</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">投标文件生成系统</h1>
         <p className="text-gray-500 mt-1">
           AI智能匹配最优方案，预测评分提升中标率
         </p>
+        {monthlyGenerateLimit !== Infinity && (
+          <p className="text-sm text-amber-600 mt-2">
+            本月已使用 {monthlyGenerateUsed} / {monthlyGenerateLimit} 次（招标+投标生成合计）
+          </p>
+        )}
       </div>
 
       <div className="flex gap-6 items-start">
@@ -179,6 +227,17 @@ export default function PlanCustom() {
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="p-4 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={handleApplyPlan}
+                disabled={!canUseGenerate || !selectedPlan}
+                className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                <Zap className="w-4 h-4" />
+                {!canUseGenerate ? `本月次数已用完` : '应用方案（计 1 次）'}
+              </button>
             </div>
           </div>
         </div>
@@ -333,6 +392,32 @@ export default function PlanCustom() {
             </div>
           </div>
 
+          {/* 投标要点清单（从招标文件解析） */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
+              <FileText className="w-5 h-5 text-slate-600" />
+              <h3 className="font-bold text-gray-800">投标要点清单</h3>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-gray-500 mb-4">智能解析招标文件，自动提取核心信息（演示数据）</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {bidKeyPoints.map((group, index) => (
+                  <div key={index} className="p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                    <h4 className="font-bold text-gray-800 text-sm mb-3">{group.type}</h4>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      {group.items.map((item, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Section 3: 竞争分析 */}
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
@@ -370,6 +455,10 @@ export default function PlanCustom() {
                           <span className="text-red-700 font-bold flex items-center gap-1.5 mb-1"><AlertTriangle className="w-3.5 h-3.5" /> 潜在弱点</span>
                           <p className="text-gray-600 font-medium">{comp.weakness}</p>
                         </div>
+                      </div>
+                      <div className="text-sm text-gray-600 mb-3">
+                        <span className="font-bold text-gray-700">近 3 年报价下浮区间：</span>
+                        <span className="ml-2 font-medium text-orange-600">{comp.priceDownRange ?? '—'}</span>
                       </div>
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                         <div

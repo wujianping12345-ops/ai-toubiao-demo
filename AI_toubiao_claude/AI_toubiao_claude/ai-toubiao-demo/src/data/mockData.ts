@@ -10,6 +10,10 @@ export interface BidInfo {
   source: string;
   status: 'new' | 'tracking' | 'applied' | 'ended';
   matchScore: number;
+  /** 商机竞争指数 0-100，越低越蓝海 */
+  competitionIndex: number;
+  /** 是否中小企业预留/政采预留 */
+  smeReserved?: boolean;
   description: string;
   requirements: string[];
   contactPerson: string;
@@ -28,6 +32,8 @@ export const bidInfoList: BidInfo[] = [
     source: '浙江省政府采购网',
     status: 'new',
     matchScore: 95,
+    competitionIndex: 42,
+    smeReserved: true,
     description: '本项目旨在建设萧山区智慧城市综合管理平台，整合城市管理、公共服务、应急指挥等功能模块，实现城市运行状态的实时监测和智能分析。',
     requirements: ['具有系统集成一级资质', '近三年有类似项目经验', '项目经理需具备高级项目管理师证书'],
     contactPerson: '张工',
@@ -44,6 +50,7 @@ export const bidInfoList: BidInfo[] = [
     source: '上海市公共资源交易平台',
     status: 'tracking',
     matchScore: 88,
+    competitionIndex: 68,
     description: '对浦东新区政务服务中心进行整体装修改造，包括办公区域、服务大厅、会议室等区域的装修设计与施工。',
     requirements: ['建筑装修装饰工程专业承包一级', '具有绿色建筑设计经验', '需提供完整的装修设计方案'],
     contactPerson: '李主任',
@@ -60,6 +67,8 @@ export const bidInfoList: BidInfo[] = [
     source: '广东省政府采购网',
     status: 'applied',
     matchScore: 82,
+    competitionIndex: 55,
+    smeReserved: true,
     description: '为天河区中小学校采购智慧教育设备，包括智慧黑板、录播系统、校园网络设备等。',
     requirements: ['具有教育信息化产品供应经验', '提供三年质保服务', '需通过教育部教育装备质量检测'],
     contactPerson: '王科长',
@@ -76,6 +85,7 @@ export const bidInfoList: BidInfo[] = [
     source: '深圳市公共资源交易中心',
     status: 'ended',
     matchScore: 75,
+    competitionIndex: 28,
     description: '负责南山区科技园片区道路绿化带的日常养护、补植及景观提升工作，服务期限为三年。',
     requirements: ['城市园林绿化企业二级及以上资质', '具有市政道路绿化养护经验', '配备专业养护团队'],
     contactPerson: '陈工',
@@ -92,6 +102,7 @@ export const bidInfoList: BidInfo[] = [
     source: '中国政府采购网',
     status: 'new',
     matchScore: 91,
+    competitionIndex: 72,
     description: '为朝阳区中心医院采购CT、MRI、超声诊断仪等大型医疗设备，提升医院诊疗能力。',
     requirements: ['具有医疗器械经营许可证', '产品需通过CFDA认证', '提供安装调试及培训服务'],
     contactPerson: '赵处长',
@@ -138,6 +149,41 @@ export const policyList: PolicyInfo[] = [
     summary: '提高中小企业预留份额至40%，降低投标保证金比例，简化资格审查要求。',
     impact: 'high',
   },
+];
+
+// 采购意向 / 拟建项目（预计 30–90 天内招标）
+export interface UpcomingBid {
+  id: string;
+  title: string;
+  region: string;
+  estimatedBudget: string;
+  category: string;
+  expectedDays: number; // 预计多少天内招标
+}
+
+export const upcomingBidList: UpcomingBid[] = [
+  { id: 'UP-001', title: '某省政务云平台扩容及安全加固项目', region: '浙江省', estimatedBudget: '约 2,000 万元', category: '信息化建设', expectedDays: 45 },
+  { id: 'UP-002', title: '某市轨道交通智慧运维系统', region: '广东省广州市', estimatedBudget: '约 1,500 万元', category: '信息化建设', expectedDays: 60 },
+  { id: 'UP-003', title: '某区医院综合楼装修改造工程', region: '北京市海淀区', estimatedBudget: '约 800 万元', category: '装修装饰', expectedDays: 30 },
+  { id: 'UP-004', title: '某市中小学智慧校园设备采购', region: '江苏省南京市', estimatedBudget: '约 1,200 万元', category: '设备采购', expectedDays: 75 },
+  { id: 'UP-005', title: '某区公园绿化提升及养护项目', region: '广东省深圳市', estimatedBudget: '约 500 万元', category: '园林绿化', expectedDays: 90 },
+];
+
+// 竞争烈度（按地区，用于热力图）
+export interface CompetitionHeatItem {
+  region: string;
+  level: 'high' | 'medium' | 'low';
+  label: string;
+}
+
+export const competitionHeatByRegion: CompetitionHeatItem[] = [
+  { region: '北京市', level: 'high', label: '高' },
+  { region: '上海市', level: 'high', label: '高' },
+  { region: '广东省', level: 'medium', label: '中' },
+  { region: '浙江省', level: 'medium', label: '中' },
+  { region: '江苏省', level: 'medium', label: '中' },
+  { region: '四川省', level: 'low', label: '低' },
+  { region: '湖北省', level: 'low', label: '低' },
 ];
 
 // 投标文件模板数据
@@ -359,6 +405,8 @@ export interface ReviewData {
   id: string;
   projectName: string;
   bidDate: string;
+  openBidDate: string;   // 开标日期
+  winningDate: string;  // 中标日期
   result: 'win' | 'lose';
   ourPrice: string;
   winningPrice: string;
@@ -370,7 +418,9 @@ export const reviewList: ReviewData[] = [
   {
     id: 'REV-001',
     projectName: '某市政务云平台建设项目',
-    bidDate: '2025-12-15',
+    bidDate: '2025-12-10',
+    openBidDate: '2025-12-15',
+    winningDate: '2025-12-18',
     result: 'win',
     ourPrice: '1,580万元',
     winningPrice: '1,580万元',
@@ -380,7 +430,9 @@ export const reviewList: ReviewData[] = [
   {
     id: 'REV-002',
     projectName: '某区智慧交通管理系统项目',
-    bidDate: '2025-11-20',
+    bidDate: '2025-11-15',
+    openBidDate: '2025-11-20',
+    winningDate: '2025-11-25',
     result: 'lose',
     ourPrice: '920万元',
     winningPrice: '780万元',
